@@ -1,68 +1,19 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## iOS friendly Create-React-App Service Worker
 
-## Available Scripts
+### Note: I haven't tested this example but this is how I solved the issue for my project.
 
-In the project directory, you can run:
+### MIT license - use as you like.
 
-### `npm start`
+[As noted by Speckles](https://stackoverflow.com/a/55612041/5553768), it appears that iOS will update the serviceworker prior to launching the app.<br/>
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+This means the `onupdatefound` event isn't very useful for prompting the user for a refresh.<br/>
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+See in App.js we register the serviceworker and pass in a callback for the SW to let us know when the new SW has been installed.<br/>
 
-### `npm test`
+Because Safari has already installed the SW before launching, `registerValidSW()` doesn't catch the `installing state`.<br/>
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This work-around checks at the top of `registerValidSW()` if the browser is Safari - `if (navigator.vendor === 'Apple Computer, Inc.')`, and checks if the state of the registration is `waiting`.<br/>
 
-### `npm run build`
+If so, then it executes our callback which sets the `promptRefresh` attribute in App.js state to true which in turn renders our refresh prompt.<br/>
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+The `onClick()` event for the button gets the SW registration and posts the skip waiting message: `reg.waiting.postMessage({ type: 'SKIP_WAITING' });` followed by a reload of the page.

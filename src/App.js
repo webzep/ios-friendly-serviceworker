@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import * as serviceWorker from './serviceWorker';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			promptRefresh: false,
+		};
+	}
+
+	componentDidMount() {
+		serviceWorker.register({
+			onUpdate: (registration) => {
+				if (registration && registration.waiting) {
+					this.setState({ promptRefresh: true });
+				} else {
+					this.setState({ promptRefresh: false });
+				}
+			},
+		});
+	}
+
+	handleRefreshForUpdate = () => {
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker
+				.getRegistration()
+				.then((reg) => {
+					reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+					window.location.reload();
+				})
+				.catch((err) => console.log('Could not get registration: ', err));
+		}
+	};
+
+	render() {
+		const refreshButton = this.state.promptRefresh ? (
+			<button onClick={this.handleRefreshForUpdate}>Refresh for updates</button>
+		) : null;
+
+		return (
+			<div className='App'>
+				{refreshButton}
+				<h1>All Hail</h1>
+				<img alt='fill muz' src='https://www.fillmurray.com/300/200' />
+			</div>
+		);
+	}
 }
 
 export default App;
