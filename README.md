@@ -1,8 +1,10 @@
-## iOS friendly Create-React-App Service Worker
+## iOS friendly Create-React-App Service Worker update prompt
 
 ### Note: I haven't tested this example but this is how I solved the issue for my project.
 
 ### MIT license - use as you like.
+
+TL;DR: Check if the registration state is `waiting`. Safari doesn't give the SW a chance to notice the `installing` state.<br/>
 
 [As noted by Speckles](https://stackoverflow.com/a/55612041/5553768), it appears that iOS will update the serviceworker prior to launching the app.<br/>
 
