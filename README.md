@@ -2,10 +2,12 @@
 
 ### Note: I haven't tested this example but this is how I solved the issue for my project.
 
-### MIT license - use as you like.
+- MIT license - use as you like.
 
-TL;DR: Check if the registration state is `waiting`. Safari doesn't give the SW a chance to notice the `installing` state.<br/>
+### TL;DR: 
+Check if the registration state is `waiting`. Safari doesn't give the SW a chance to notice the `installing` state.<br/>
 
+### How to:
 [As noted by Speckles](https://stackoverflow.com/a/55612041/5553768), it appears that iOS will update the serviceworker prior to launching the app.<br/>
 
 This means the `onupdatefound` event isn't very useful for prompting the user for a refresh.<br/>
